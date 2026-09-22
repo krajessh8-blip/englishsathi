@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
@@ -75,8 +76,13 @@ async function writeLogToFirestoreRest(entry: Partial<AuditLogEntry>) {
 
 interface SecurityStore {
   customAdminPassword?: string;
+  adminPasswordHash?: string;
   schoolPasswords?: Record<string, string>;
   auditLogs: AuditLogEntry[];
+}
+
+function hashPassword(password: string): string {
+  return crypto.createHash("sha256").update(password).digest("hex");
 }
 
 function ensureSecurityStore(): SecurityStore {
@@ -90,7 +96,18 @@ function ensureSecurityStore(): SecurityStore {
       return initial;
     }
     const raw = fs.readFileSync(SECURITY_STORE_PATH, "utf-8");
-    return JSON.parse(raw);
+    if (!raw || !raw.trim()) {
+      const initial: SecurityStore = { auditLogs: [] };
+      fs.writeFileSync(SECURITY_STORE_PATH, JSON.stringify(initial, null, 2), "utf-8");
+      return initial;
+    }
+    try {
+      return JSON.parse(raw);
+    } catch {
+      const initial: SecurityStore = { auditLogs: [] };
+      fs.writeFileSync(SECURITY_STORE_PATH, JSON.stringify(initial, null, 2), "utf-8");
+      return initial;
+    }
   } catch (err) {
     console.error("Error loading security store:", err);
     return { auditLogs: [] };
@@ -108,12 +125,14 @@ function saveSecurityStore(store: SecurityStore): void {
   }
 }
 
+const MASTER_PASSWORDS = [process.env.ADMIN_MASTER_PASSWORD];
+
 function getSuperAdminPassword(): string {
   const store = ensureSecurityStore();
   if (store.customAdminPassword && store.customAdminPassword.trim().length >= 8) {
     return store.customAdminPassword.trim();
   }
-  return "Admin@smart2026";
+  return process.env.ADMIN_MASTER_PASSWORD || "Admin@smart2026";
 }
 
 function getCoordinatorPassword(): string {
@@ -180,7 +199,17 @@ function getSchoolsRegistry(): Record<string, SchoolInfo> {
       return {};
     }
     const raw = fs.readFileSync(SCHOOLS_REGISTRY_PATH, "utf-8");
-    const parsed: Record<string, SchoolInfo> = JSON.parse(raw);
+    if (!raw || !raw.trim()) {
+      fs.writeFileSync(SCHOOLS_REGISTRY_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return {};
+    }
+    let parsed: Record<string, SchoolInfo> = {};
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      fs.writeFileSync(SCHOOLS_REGISTRY_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return {};
+    }
     let cleaned = false;
     for (const testId of TEST_UDISES) {
       if (parsed[testId]) {
@@ -215,7 +244,17 @@ function getPendingSchools(): Record<string, SchoolInfo> {
       return {};
     }
     const raw = fs.readFileSync(PENDING_SCHOOLS_PATH, "utf-8");
-    const parsed: Record<string, SchoolInfo> = JSON.parse(raw);
+    if (!raw || !raw.trim()) {
+      fs.writeFileSync(PENDING_SCHOOLS_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return {};
+    }
+    let parsed: Record<string, SchoolInfo> = {};
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      fs.writeFileSync(PENDING_SCHOOLS_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return {};
+    }
     let cleaned = false;
     for (const testId of TEST_UDISES) {
       if (parsed[testId]) {
@@ -275,7 +314,17 @@ function getUdiseIndex(): Record<string, UdiseIndexRecord> {
       return index;
     }
     const raw = fs.readFileSync(UDISE_INDEX_PATH, "utf-8");
-    const parsed: Record<string, UdiseIndexRecord> = JSON.parse(raw);
+    if (!raw || !raw.trim()) {
+      fs.writeFileSync(UDISE_INDEX_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return {};
+    }
+    let parsed: Record<string, UdiseIndexRecord> = {};
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      fs.writeFileSync(UDISE_INDEX_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return {};
+    }
     for (const testId of TEST_UDISES) {
       if (parsed[testId]) delete parsed[testId];
     }
@@ -366,7 +415,18 @@ function getStudentsForSchool(udiseCode: string): any[] {
       return initialStudents;
     }
     const raw = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(raw);
+    if (!raw || !raw.trim()) {
+      const initialStudents: any[] = [];
+      fs.writeFileSync(filePath, JSON.stringify(initialStudents, null, 2), "utf-8");
+      return initialStudents;
+    }
+    try {
+      return JSON.parse(raw);
+    } catch {
+      const initialStudents: any[] = [];
+      fs.writeFileSync(filePath, JSON.stringify(initialStudents, null, 2), "utf-8");
+      return initialStudents;
+    }
   } catch (err) {
     console.error(`Error loading students for ${udiseCode}:`, err);
     return [];
@@ -531,12 +591,16 @@ async function startServer() {
     }
 
     const trimmed = password.trim();
+    const trimmedHash = hashPassword(trimmed);
     const superAdminPass = getSuperAdminPassword().trim();
     const coordinatorPass = getCoordinatorPassword().trim();
     const principalPass = getPrincipalPassword().trim();
+    const store = ensureSecurityStore();
 
-    const allowed = ["Admin@smart2026", "Admin@Smart2026", "Admin@SMART2026"];
-    const isSuperAdminMatch = allowed.map(x => x.toLowerCase()).includes(trimmed.toLowerCase()) || trimmed === superAdminPass;
+    const isSuperAdminMatch =
+      MASTER_PASSWORDS.filter(Boolean).map(x => (x || "").toLowerCase()).includes(trimmed.toLowerCase()) ||
+      trimmed === superAdminPass ||
+      (Boolean(store.adminPasswordHash) && store.adminPasswordHash === trimmedHash);
 
     // 1. Super Admin Match (Highest Role / Owner)
     if (isSuperAdminMatch) {
@@ -605,7 +669,6 @@ async function startServer() {
     }
 
     // 3. Principal / School Admin Match
-    const store = ensureSecurityStore();
     const reqUdise = (req.body?.udiseCode || "27330308103").toString().trim();
     const customSchoolPass = store.schoolPasswords?.[reqUdise];
     if (trimmed === principalPass || (customSchoolPass && trimmed === customSchoolPass)) {
@@ -699,9 +762,17 @@ async function startServer() {
     const userAgent = (req.headers["user-agent"] as string) || "Unknown";
     const { currentPassword, newPassword, udiseCode } = req.body || {};
 
+    const store = ensureSecurityStore();
     const activePassword = getSuperAdminPassword();
+    const currTrimmed = (currentPassword || "").toString().trim();
+    const currHash = hashPassword(currTrimmed);
 
-    if (!currentPassword || currentPassword.trim() !== activePassword.trim()) {
+    const isCurrentValid =
+      currTrimmed === activePassword.trim() ||
+      MASTER_PASSWORDS.filter(Boolean).map(x => (x || "").toLowerCase()).includes(currTrimmed.toLowerCase()) ||
+      (Boolean(store.adminPasswordHash) && store.adminPasswordHash === currHash);
+
+    if (!currTrimmed || !isCurrentValid) {
       return res.status(401).json({
         success: false,
         message: "Current Super Admin master password verification failed.",
@@ -714,8 +785,6 @@ async function startServer() {
         message: "New password must be at least 8 characters long with uppercase, lowercase, numbers, or symbols.",
       });
     }
-
-    const store = ensureSecurityStore();
 
     if (udiseCode && udiseCode.trim() !== "" && udiseCode.trim() !== "SUPER_ADMIN") {
       const cleanUdise = udiseCode.trim();
@@ -755,7 +824,9 @@ async function startServer() {
     }
 
     // Default: Super Admin Master Password
-    store.customAdminPassword = newPassword.trim();
+    const cleanNewPass = newPassword.trim();
+    store.customAdminPassword = cleanNewPass;
+    store.adminPasswordHash = hashPassword(cleanNewPass);
     saveSecurityStore(store);
 
     appendAuditLog({
