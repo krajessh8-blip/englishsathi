@@ -1,0 +1,205 @@
+/* ==========================================================================
+   SMART ENGLISH SATHI - CLEAN LIGHT THEME (AUTHENTICATED DASHBOARD SCOPE ONLY)
+   Strictly scoped to .dashboard-light-theme. Home and Login pages remain 100% intact.
+   ========================================================================== */
+
+.dashboard-light-theme {
+  --bg-dashboard: #F8F9FC;
+  --card-bg: #FFFFFF;
+  --card-border: #E9ECEF;
+  --sidebar-bg: #FFFFFF;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --input-bg: #FFFFFF;
+  --input-border: #E2E8F0;
+
+  background-color: #F8F9FC !important;
+  color: #1E293B !important;
+}
+
+/* Override background on cards & containers inside dashboard */
+.dashboard-light-theme div[class*="bg-white"],
+.dashboard-light-theme .bg-white,
+.dashboard-light-theme .dashboard-card,
+.dashboard-light-theme [class*="rounded"][class*="bg-white"],
+.dashboard-light-theme .card {
+  background: #FFFFFF !important;
+  background-image: none !important;
+  border-color: #E9ECEF !important;
+  color: #1E293B !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Sidebar styling */
+.dashboard-light-theme .sidebar,
+.dashboard-light-theme aside {
+  background-color: #FFFFFF !important;
+  border-right: 1px solid #E9ECEF !important;
+  color: #1E293B !important;
+}
+
+/* Header */
+.dashboard-light-theme header:not(.keep-dark) {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid #E9ECEF !important;
+  color: #1E293B !important;
+}
+
+/* Form inputs, textareas, selects */
+.dashboard-light-theme input,
+.dashboard-light-theme select,
+.dashboard-light-theme textarea {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #1E293B !important;
+  border-radius: 12px !important;
+}
+
+.dashboard-light-theme input:focus,
+.dashboard-light-theme select:focus,
+.dashboard-light-theme textarea:focus {
+  border-color: #2563EB !important;
+  outline: 2px solid rgba(37, 99, 235, 0.15) !important;
+}
+
+.dashboard-light-theme input::placeholder,
+.dashboard-light-theme textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Typography contrast */
+.dashboard-light-theme h1,
+.dashboard-light-theme h2,
+.dashboard-light-theme h3,
+.dashboard-light-theme h4,
+.dashboard-light-theme h5,
+.dashboard-light-theme h6 {
+  color: #1E293B !important;
+}
+
+.dashboard-light-theme label {
+  color: #334155 !important;
+}
+
+.dashboard-light-theme p {
+  color: #334155;
+}
+
+.dashboard-light-theme .text-slate-400,
+.dashboard-light-theme .text-slate-500,
+.dashboard-light-theme .text-gray-400,
+.dashboard-light-theme .text-gray-500,
+.dashboard-light-theme .text-muted {
+  color: #64748B !important;
+}
+
+.dashboard-light-theme .text-slate-200,
+.dashboard-light-theme .text-slate-300 {
+  color: #334155 !important;
+}
+
+/* Links */
+.dashboard-light-theme a:not([class*="bg-"]):not([class*="text-"]):not(.btn) {
+  color: #2563EB !important;
+}
+
+/* Tables */
+.dashboard-light-theme table {
+  background-color: #FFFFFF !important;
+  color: #1E293B !important;
+}
+
+.dashboard-light-theme table thead,
+.dashboard-light-theme table thead tr,
+.dashboard-light-theme table th {
+  background-color: #F8F9FA !important;
+  color: #64748B !important;
+  border-bottom: 1px solid #E9ECEF !important;
+}
+
+.dashboard-light-theme table tbody tr {
+  border-bottom: 1px solid #E9ECEF !important;
+  color: #1E293B !important;
+}
+
+.dashboard-light-theme table tbody tr:hover {
+  background-color: #F8F9FC !important;
+}
+
+/* Modals */
+.dashboard-light-theme [id$="ModalContent"],
+.dashboard-light-theme .modal-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E9ECEF !important;
+  color: #1E293B !important;
+}
+
+/* Subtle borders */
+.dashboard-light-theme .border-slate-800,
+.dashboard-light-theme .border-slate-900,
+.dashboard-light-theme .border-slate-700 {
+  border-color: #E9ECEF !important;
+}
+
+/* Dark container and card overrides in dashboard */
+.dashboard-light-theme .bg-slate-950,
+.dashboard-light-theme .bg-slate-900,
+.dashboard-light-theme .bg-gray-950,
+.dashboard-light-theme .bg-gray-900 {
+  background-color: #FFFFFF !important;
+  border-color: #E9ECEF !important;
+  color: #1E293B !important;
+}
+
+/* Specific slate-800 non-button blocks */
+.dashboard-light-theme div[class*="bg-slate-800"],
+.dashboard-light-theme section[class*="bg-slate-800"] {
+  background-color: #FFFFFF !important;
+  border-color: #E9ECEF !important;
+}
+
+/* Action & utility buttons with dark slate classes */
+.dashboard-light-theme button.bg-slate-900,
+.dashboard-light-theme button.bg-slate-800,
+.dashboard-light-theme a.bg-slate-900,
+.dashboard-light-theme a.bg-slate-800 {
+  background-color: #F1F5F9 !important;
+  color: #1E293B !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.dashboard-light-theme button.bg-slate-900:hover,
+.dashboard-light-theme button.bg-slate-800:hover,
+.dashboard-light-theme a.bg-slate-900:hover,
+.dashboard-light-theme a.bg-slate-800:hover {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Preserve bright text on brand gradient/colored buttons */
+.dashboard-light-theme button[class*="bg-blue-"],
+.dashboard-light-theme button[class*="bg-purple-"],
+.dashboard-light-theme button[class*="bg-emerald-"],
+.dashboard-light-theme button[class*="bg-indigo-"],
+.dashboard-light-theme button[class*="bg-rose-"],
+.dashboard-light-theme a[class*="bg-blue-"],
+.dashboard-light-theme a[class*="bg-purple-"],
+.dashboard-light-theme a[class*="bg-emerald-"],
+.dashboard-light-theme a[class*="bg-indigo-"],
+.dashboard-light-theme a[class*="bg-rose-"],
+.dashboard-light-theme button[class*="bg-gradient-"],
+.dashboard-light-theme a[class*="bg-gradient-"] {
+  color: #FFFFFF !important;
+}
+
+/* Headings contrast */
+.dashboard-light-theme h1.text-white,
+.dashboard-light-theme h2.text-white,
+.dashboard-light-theme h3.text-white,
+.dashboard-light-theme h4.text-white,
+.dashboard-light-theme div.text-white:not([class*="bg-blue-"]):not([class*="bg-purple-"]):not([class*="bg-emerald-"]):not([class*="bg-amber-"]),
+.dashboard-light-theme span.text-white:not([class*="bg-blue-"]):not([class*="bg-purple-"]):not([class*="bg-emerald-"]):not([class*="bg-amber-"]) {
+  color: #1E293B !important;
+}
+

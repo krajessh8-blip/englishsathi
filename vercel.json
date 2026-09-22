@@ -1,0 +1,37 @@
+{
+  "functions": {
+    "api/auth/*.js": {
+      "includeFiles": "**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/stc-admin-secure-2026",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/stc-admin-secure-2026/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/classroom",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

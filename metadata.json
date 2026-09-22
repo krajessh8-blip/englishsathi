@@ -1,0 +1,6 @@
+{
+  "name": "Smart English Sathi",
+  "description": "Interactive English conversation and grammar learning app featuring 4 tabs (Watch & Listen, Write & Vocab, Role Play, and Grammar) with 10 progressive curriculum levels, an 8-step interactive grammar learning cycle, speech recognition & shadowing, Principal/Admin analytics, and teacher management.",
+  "requestFramePermissions": ["microphone", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
